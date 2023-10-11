@@ -1,9 +1,9 @@
 from django.db import models
 from movie.models import Movie
+from django.contrib.auth.models import AbstractUser
 
 
-class User(models.Model):
-    user_id = models.IntegerField(primary_key=True, null=False)
+class User(AbstractUser):
     username = models.CharField(max_length=128, null=False)
     firstname = models.CharField(max_length=128, null=False)
     lastname = models.CharField(max_length=128, null=False)

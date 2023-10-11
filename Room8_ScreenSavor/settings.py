@@ -80,16 +80,14 @@ WSGI_APPLICATION = 'Room8_ScreenSavor.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.mysql',
+        'ENGINE': 'mysql.connector.django',
         'NAME': 'screensavor',
         'USER': 'root',
-        'PASSWORD': '',
+        'PASSWORD': 'admin',
         'HOST': 'localhost',
-        'PORT': '3306',
-        'OPTIONS': {'init_command': "SET SQL_MODE='STRICT_TRANS_TABLES'"}
+        'PORT': '3307',
     }
 }
-
 
 # Password validation
 # https://docs.djangoproject.com/en/4.2/ref/settings/#auth-password-validators
