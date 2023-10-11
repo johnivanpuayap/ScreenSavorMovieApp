@@ -1,0 +1,22 @@
+{% extends 'user/base.html' %}
+
+{% block content %}
+
+    <h1>Login</h1>
+    <hr>
+
+    <form action="" method="POST">
+
+        {% if alert_message %}
+        <script>
+            alert("{{ alert_message|escapejs }}");
+        </script>
+        {% endif %}
+
+        {% csrf_token %}
+        {{ form.as_p }}
+
+        <input type="submit" name="Submit" value="Login">
+    </form>
+
+{% endblock %}
