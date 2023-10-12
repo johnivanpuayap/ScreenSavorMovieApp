@@ -25,8 +25,17 @@
     <orderEntry type="jdk" jdkName="Python 3.11 (Room8_ScreenSavor)" jdkType="Python SDK" />
     <orderEntry type="sourceFolder" forTests="false" />
     <orderEntry type="library" name="Google App Engine SDK" level="project" />
+    <orderEntry type="library" name="Google App Engine SDK" level="project" />
+    <orderEntry type="library" name="tailwindcss" level="application" />
   </component>
   <component name="TemplatesService">
     <option name="TEMPLATE_CONFIGURATION" value="Django" />
+    <option name="TEMPLATE_FOLDERS">
+      <list>
+        <option value="$MODULE_DIR$/templates" />
+        <option value="$MODULE_DIR$/movie/templates" />
+        <option value="$MODULE_DIR$/user/templates" />
+      </list>
+    </option>
   </component>
 </module>

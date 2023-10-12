@@ -5,7 +5,7 @@ from .forms import *
 
 # Views for Login
 def home(request):
-    return render(request, 'home.html')
+    return render(request, 'user/home.html')
 
 
 def login_page(request):
