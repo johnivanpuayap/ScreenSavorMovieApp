@@ -1,15 +1,14 @@
-from django.contrib.auth import authenticate, login
+from django.contrib.auth import authenticate, login, logout
 from django.shortcuts import render, redirect
 from .forms import *
 
 
-# Create your views here.
+# Views for Login
+def home(request):
+    return render(request, 'home.html')
 
-def index(request):
-    return render(request, 'user/home.html')
 
-
-def loginPage(request):
+def login_page(request):
     alert_message = None
     if request.method == 'GET':
         form = LoginForm()
@@ -29,7 +28,12 @@ def loginPage(request):
     return render(request, 'user/login.html', context)
 
 
-def registerPage(request):
+def logout_user(request):
+    logout(request)
+    return redirect('home')
+
+
+def register_page(request):
     if request.method == 'GET':
         form = RegisterForm()
         alert_message = None
@@ -44,10 +48,3 @@ def registerPage(request):
     form = RegisterForm()
     context = {"form": form, "alert_message": alert_message}
     return render(request, 'user/register.html', context)
-
-
-
-
-def homePage(request):
-    return render(request, 'user/home.html')
-

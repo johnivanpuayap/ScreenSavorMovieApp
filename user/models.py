@@ -1,11 +1,10 @@
 from django.db import models
 from movie.models import Movie
+from django.contrib.auth.models import AbstractUser
 
 
-class User(models.Model):
-    # user_id = models.IntegerField(primary_key=True, null=False)
-    username = models.CharField(max_length=32, null=False, unique=True)
-    password = models.CharField(max_length=32, null=False)
+class User(AbstractUser):
+    username = models.CharField(max_length=32, null=False, primary_key=True)
     firstname = models.CharField(max_length=128, null=False)
     lastname = models.CharField(max_length=128, null=False)
 
@@ -28,7 +27,6 @@ class WatchList(models.Model):
 
 
 class WatchHistory(models.Model):
-    # watchHistory_id = models.IntegerField(primary_key=True, null=False)
     user = models.ForeignKey(User, null=False, on_delete=models.CASCADE)
     movie = models.ForeignKey(Movie, null=False, on_delete=models.CASCADE)
     date = models.DateField(null=False)

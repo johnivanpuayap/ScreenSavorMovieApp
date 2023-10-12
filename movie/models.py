@@ -3,18 +3,15 @@ from django.db import models
 
 # Create your models here.
 class Genre(models.Model):
-    genre_id = models.IntegerField(primary_key=True)
     name = models.CharField(max_length=100)
 
 
 class Director(models.Model):
-    director_id = models.IntegerField(primary_key=True)
     first_name = models.CharField(max_length=100)
     last_name = models.CharField(max_length=100)
 
 
 class Cast(models.Model):
-    cast_id = models.IntegerField(primary_key=True)
     first_name = models.CharField(max_length=100)
     last_name = models.CharField(max_length=100)
 
