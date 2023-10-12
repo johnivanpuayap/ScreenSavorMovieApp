@@ -5,8 +5,8 @@ from django.contrib.auth.models import AbstractUser
 
 class User(AbstractUser):
     username = models.CharField(max_length=32, null=False, primary_key=True)
-    firstname = models.CharField(max_length=128, null=False)
-    lastname = models.CharField(max_length=128, null=False)
+    first_name = models.CharField(max_length=128, null=False)
+    last_name = models.CharField(max_length=128, null=False)
 
 
 class Follow(models.Model):

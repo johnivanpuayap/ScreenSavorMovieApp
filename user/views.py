@@ -1,5 +1,4 @@
 from django.contrib.auth import authenticate, login, logout
-from django.contrib.auth.forms import AuthenticationForm
 from django.shortcuts import render, redirect
 from .forms import *
 from django.views.generic.base import View
@@ -15,13 +14,15 @@ class LoginView(View):
         if form.is_valid():
             user = form.get_user()
             login(request, user)
-            return redirect('home')  # Redirect to your home page
+            return redirect('home')
+        else:
+            print(form.errors)
         return render(request, 'user/login.html', {'form': form})
 
 
 def logout_user(request):
     logout(request)
-    return redirect('home')
+    return redirect('login')
 
 
 class RegistrationView(View):
