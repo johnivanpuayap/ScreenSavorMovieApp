@@ -34,9 +34,11 @@ class RegistrationView(View):
         form = RegisterForm(request.POST)
         if form.is_valid():
             user = form.save(commit=False)
-            user.username = user.username.lower()
+            user.username = form.cleaned_data['username'].lower()
+            user.set_password(form.cleaned_data['password'])
             user.save()
-
             login(request, user)
             return redirect('login')
+        else:
+            print(form.errors)
         return render(request, 'user/register.html', {'form': form})
