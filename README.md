@@ -1,6 +1,6 @@
 # To do List
-- [ ] Admin Registration
 - [X] User Login and Registration
+- [X] Admin Registration
 - [ ] Display Movies
 - [ ] Movie Catalog
   - [ ] Movie Information
@@ -19,5 +19,5 @@
   - [ ] Add filters
 
 # Possible Changes
-- Add Synopsis for movie
-- 
+- Add Synopsis on Movie Information
+- Hide Admin Registration
