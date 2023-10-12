@@ -1,6 +1,6 @@
 # To do List
 - [ ] Admin Registration
-- [ ] User Login and Registration
+- [X] User Login and Registration
 - [ ] Display Movies
 - [ ] Movie Catalog
   - [ ] Movie Information

@@ -42,3 +42,23 @@ class RegistrationView(View):
         else:
             print(form.errors)
         return render(request, 'user/register.html', {'form': form})
+
+
+class AdminRegistrationView(View):
+    def get(self, request):
+        form = RegisterForm()
+        return render(request, 'user/register.html', {'form': form})
+
+    def post(self, request):
+        form = RegisterForm(request.POST)
+        if form.is_valid():
+            user = form.save(commit=False)
+            user.username = form.cleaned_data['username']
+            user.set_password(form.cleaned_data['password'])
+            user.is_staff = True
+            user.save()
+            login(request, user)
+            return redirect('login')
+        else:
+            print(form.errors)
+        return render(request, 'user/register.html', {'form': form})
