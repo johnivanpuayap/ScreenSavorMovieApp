@@ -14,9 +14,16 @@
   </head>
 
   <body>
-    <!-- Your HTML content with Tailwind CSS classes -->
-    <div class="bg-blue-500 text-white p-4">
-      This is a styled div using Tailwind CSS.
-    </div>
+    {% include 'navbar.html'%}
+
+    {% block content %}
+        {% if messages %}
+            <ul class="messages">
+            {% for message in messages %}
+                <li>{{ message }}</li>
+            {% endfor %}
+            </ul>
+        {% endif %}
+    {% endblock %}
   </body>
 </html>

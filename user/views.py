@@ -1,31 +1,22 @@
 from django.contrib.auth import authenticate, login, logout
+from django.contrib.auth.forms import AuthenticationForm
 from django.shortcuts import render, redirect
 from .forms import *
+from django.views.generic.base import View
 
 
-# Views for Login
-def home(request):
-    return render(request, 'user/home.html')
+class LoginView(View):
+    def get(self, request):
+        form = AuthenticationForm()
+        return render(request, 'user/login.html', {'form': form})
 
-
-def login_page(request):
-    alert_message = None
-    if request.method == 'GET':
-        form = LoginForm()
-    else:
-        form = LoginForm(request.POST)
+    def post(self, request):
+        form = AuthenticationForm(data=request.POST)
         if form.is_valid():
-            username = form.cleaned_data['username']
-            password = form.cleaned_data['password']
-            user = authenticate(request, username=username, password=password)
-            if user is not None:
-                login(request, user)
-                return redirect('../home')
-            else:
-                alert_message = 'Invalid username or password.'
-
-    context = {"form": form, "alert_message": alert_message}
-    return render(request, 'user/login.html', context)
+            user = form.get_user()
+            login(request, user)
+            return redirect('home')  # Redirect to your home page
+        return render(request, 'user/login.html', {'form': form})
 
 
 def logout_user(request):
@@ -33,18 +24,18 @@ def logout_user(request):
     return redirect('home')
 
 
-def register_page(request):
-    if request.method == 'GET':
+class RegistrationView(View):
+    def get(self, request):
         form = RegisterForm()
-        alert_message = None
-    else:
+        return render(request, 'user/register.html', {'form': form})
+
+    def post(self, request):
         form = RegisterForm(request.POST)
         if form.is_valid():
-            form.save()
-            alert_message = 'Registration successful!'
-        else:
-            alert_message = 'Username already taken.'
+            user = form.save(commit=False)
+            user.username = user.username.lower()
+            user.save()
 
-    form = RegisterForm()
-    context = {"form": form, "alert_message": alert_message}
-    return render(request, 'user/register.html', context)
+            login(request, user)
+            return redirect('login')
+        return render(request, 'user/register.html', {'form': form})
