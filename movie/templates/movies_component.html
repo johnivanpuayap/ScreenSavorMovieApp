@@ -1,0 +1,19 @@
+<div>
+    <div >
+        <h2>Browse Movies</h2>
+    </div>
+    <ul class="movies__list">
+        <li>
+            <a href="{% url 'home' %}" class="active">All <span>{{ movies.count }}</span></a>
+        </li>
+        {% for movie in movies %}
+            <li>
+                {{ movie.title }}
+            </li>
+            <li>
+                {{ movie.description }}
+            </li>
+            <br>
+        {% endfor %}
+    </ul>
+</div>
