@@ -1,25 +1,24 @@
 # To do List
 - [X] User Login and Registration
 - [X] Admin Registration
-- [ ] Display All Movies
+- [X] Display All Movies
 - [ ] Display a Movie
-  - [ ] Show Movie Information
+  - [X] Show Movie Information
   - [ ] Show Cast with their Roles
-  - [ ] Show the Director
   - [ ] Show the Movie Reviews and Rating
+  - [ ] Restructure the models to use id for better url routing
 - [ ] View a Cast Member
   - [ ] Show the Cast Member Profile
   - [ ] Show Cast Member's Filmography
 - [ ] View a Director
   - [ ] Show the Director's Information
   - [ ] Show the Director's Filmography
-- [ ] Genre-based Movie Listing
+- [ ] View a Genre
+  - [ ] Make Genres into Tags
+  - [ ] Show movies all movies in the Genre
 - [ ] Search Button
+  - [ ] Add Button to Navigation Bar 
   - [ ] Add filters
-
-# Possible Changes
-- Add Synopsis on Movie Information
-- Hide Admin Registration
 
 
 # SQL Queries for the Movie Data
