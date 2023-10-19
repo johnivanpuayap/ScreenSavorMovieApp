@@ -9,9 +9,16 @@ class HomeView(View):
         # returns all the movies
         movies = Movie.objects.all()
 
-        # returns all the movies that start with G
+        # returns all the movies that contains with g
         movies = Movie.objects.filter(
             Q(title__icontains='g')
+        )
+
+        # returns all the movies that starts with g
+        # this is case-sensitive
+        movies = Movie.objects.filter(
+            Q(title__startswith='G') |
+            Q(title__startswith='T')
         )
 
         context = {
@@ -23,10 +30,10 @@ class HomeView(View):
 
 def movie(request, movie_title):
 
-    movie = Movie.objects.get(title=movie_title)
+    movie_details = Movie.objects.get(title=movie_title)
 
     context = {
-        "movie": movie
+        "movie": movie_details
     }
 
     return render(request, "movie.html", context)
