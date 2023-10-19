@@ -1,13 +1,15 @@
-from django.shortcuts import render, get_object_or_404
+from django.shortcuts import render, get_object_or_404, redirect
 from django.views.generic.base import View
 from django.db.models import Q
 from .models import Movie, Genre
+from .forms import MovieForm
 
 
 class HomeView(View):
     def get(self, request):
         # returns all the movies
         movies = Movie.objects.all()
+        form = MovieForm()
 
         # # returns all the movies that contains with g
         # movies = Movie.objects.filter(
@@ -23,20 +25,31 @@ class HomeView(View):
 
         context = {
             'movies': movies,
+            'form': form,
         }
 
         return render(request, "index.html", context)
 
 
+class AddMovieView(View):
+    def get(self, request):
+        form = MovieForm()
+        return render(request, 'add_movie.html', {'form': form})
+
+    def post(self, request):
+        form = MovieForm(request.POST)
+        if form.is_valid():
+            form.save()
+            return redirect('home')
+
+
 def movie(request, movie_title):
     try:
         movie_details = get_object_or_404(Movie, title=movie_title)
-
         context = {
             "movie": movie_details,
         }
 
         return render(request, "movie.html", context)
     except Movie.DoesNotExist:
-        # Handle the case where the movie doesn't exist, e.g., redirect to an error page or display an error message.
         return render(request, "error.html", {"error_message": "Movie not found"})
