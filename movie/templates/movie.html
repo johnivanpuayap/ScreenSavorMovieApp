@@ -7,7 +7,14 @@
     <h1>Title: {{movie.title }}</h1>
     <p>Description: {{ movie.description }}</p>
     <p>Year Released: {{ movie.year_released }}</p>
-    <p>Genre: {{ movie.genre }}</p>
     <p>Director: {{ movie.director }}</p>
+
+    <h2>Genre:</h2>
+    <ul>
+        {% for genre in movie.genre.all %}
+            <li>{{ genre.name }}</li>
+        {% endfor %}
+    </ul>
+
 
 {% endblock content %}
