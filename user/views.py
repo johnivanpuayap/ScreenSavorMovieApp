@@ -2,7 +2,8 @@ from django.contrib.auth import authenticate, login, logout
 from django.shortcuts import render, redirect
 from .forms import *
 from django.views.generic.base import View
-
+from django.db import connection
+from django.contrib.auth.decorators import login_required
 
 class LoginView(View):
     def get(self, request):
@@ -43,7 +44,6 @@ class RegistrationView(View):
             print(form.errors)
         return render(request, 'user/register.html', {'form': form})
 
-
 class AdminRegistrationView(View):
     def get(self, request):
         form = RegisterForm()
@@ -62,3 +62,13 @@ class AdminRegistrationView(View):
         else:
             print(form.errors)
         return render(request, 'user/register.html', {'form': form})
+    
+
+@login_required(login_url='/login/')
+def like_movie(request, movie_id):
+    if request.user.is_authenticated:
+        with connection.cursor() as cursor:
+            cursor.execute("CALL LikeMovie(%s, %s)", [request.user.username, movie_id])
+        return redirect('movie', movie_id=movie_id)
+    else:
+        return render(request, "error.html", {"error_message": "You must be logged in to like a movie."})

@@ -21,6 +21,10 @@
         </li>
       </ul>
     </div>
+    <form action="{% url 'search' %}" class="flex">
+      <input class="border border-gray-400 rounded-l py-2 px-4" type="text" placeholder="Search" name="q">
+      <button class="bg-blue-500 hover:bg-blue-700 text-white py-2 px-4 rounded-r" type="submit" style="display: none;">Search</button>
+    </form>
     <div>
       {% if request.user.is_authenticated %}
         <a class="text-center block py-2 px-4 text-gray-400" href="#">{{ request.user.username }}</a>
