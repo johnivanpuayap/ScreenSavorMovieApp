@@ -40,6 +40,7 @@ INSTALLED_APPS = [
     'recommendation',
     'review',
     'collection',
+    'django_extensions',
 ]
 
 MIDDLEWARE = [

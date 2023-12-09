@@ -35,7 +35,7 @@ class Cast(models.Model):
 
 
 class Movie(models.Model):
-    title = models.CharField(max_length=100, primary_key=True)
+    title = models.CharField(max_length=100)
     year_released = models.IntegerField()
     duration = models.IntegerField()
     description = models.TextField()

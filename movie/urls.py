@@ -4,7 +4,7 @@ from . import views
 
 urlpatterns = [
     path('', HomeView.as_view(), name='home'),
-    path('<str:movie_title>', views.movie, name='movie'),
+    path('<str:movie_id>', views.movie, name='movie'),
     path('add/', AddMovieView.as_view(), name='add_movie'),
 ]
 

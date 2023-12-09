@@ -5,6 +5,6 @@ from movie.models import Movie
 
 # Create your models here.
 class Collection(models.Model):
-    name = models.CharField(max_length=250, null=False, primary_key=True)
+    name = models.CharField(max_length=250, null=False)
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     movies = models.ManyToManyField(Movie)

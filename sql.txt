@@ -1,0 +1,60 @@
+-- Insert Genres
+INSERT INTO movie_genre (name) VALUES
+  ('Action'), ('Comedy'), ('Drama'), ('Sci-Fi'), ('Horror'),
+  ('Romance'), ('Adventure'), ('Thriller'), ('Animation'), ('Fantasy'),
+  ('Biography'), ('Crime'), ('History'), ('Mystery'), ('War');
+
+-- Insert Directors
+INSERT INTO movie_director (first_name, last_name) VALUES
+  ('Christopher', 'Nolan'), ('Quentin', 'Tarantino'),
+  ('Steven', 'Spielberg'), ('Frank', 'Darabont');
+
+-- Insert Casts
+INSERT INTO movie_cast (first_name, last_name) VALUES
+  ('Tom', 'Hanks'), ('Leonardo', 'DiCaprio'), ('Ellen', 'Page'),
+  ('Joseph', 'Gordon-Levitt'), ('Jamie', 'Foxx'), ('Christoph', 'Waltz'),
+  ('John', 'Travolta'), ('Uma', 'Thurman'), ('Samuel L.', 'Jackson'),
+  ('Morgan', 'Freeman'), ('Tim', 'Robbins'), ('Bob', 'Gunton'),
+  ('Cilian', 'Murphy'), ('Emily', 'Blunt'), ('Matthew', 'McConaughey'),
+  ('Anne', 'Hathaway'), ('Brad', 'Pitt'), ('Edward', 'Norton'),
+  ('Kate', 'Winslet');
+
+-- Insert Movies
+INSERT INTO movie_movie (title, year_released, duration, description, director_id)
+VALUES
+  ('Inception', 2010, 148, 'A mind-bending thriller.', 1),
+  ('Django Unchained', 2012, 165, 'A story of revenge.', 2),
+  ('Catch Me If You Can', 2002, 141, 'A true story about Frank Abagnale Jr.', 3),
+  ('Pulp Fiction', 1994, 154, 'The lives of two mob hitmen...', 2),
+  ('The Shawshank Redemption', 1994, 142, 'Over the course of several years...', 4),
+  ('Fight Club', 1999, 139, 'An insomniac office worker and a devil-may-care soapmaker...', 5),
+  ('Interstellar', 2014, 169, 'A team of explorers travel through a wormhole in space...', 1),
+  ('Titanic', 1997, 194, 'A seventeen-year-old aristocrat falls in love with a kind but poor artist...', 6),
+  ('Oppenheimer', 2023, 180, 'The story of American scientist, J. Robert Oppenheimer...', 1),
+  ('The Dark Knight Rises', 2012, 164, 'Eight years after the Joker\'s reign of chaos...', 1);
+
+-- Insert Movie Genres
+INSERT INTO movie_movie_genre (movie_id, genre_id) VALUES
+  (1, 1), (1, 3),
+  (2, 1), (2, 3),
+  (3, 3), (3, 12),
+  (4, 12), (4, 3),
+  (5, 3),
+  (6, 3),
+  (7, 4), (7, 6), (7, 3),
+  (8, 6), (8, 3),
+  (9, 3), (9, 12), (9, 13),
+  (10, 1), (10, 3), (10, 8);
+
+-- Insert Movie Casts
+INSERT INTO movie_moviecast (movie_id, cast_id, role) VALUES
+  (1, 2, 'Cobb'), (1, 3, 'Ariadne'), (1, 4, 'Arthur'),
+  (2, 2, 'Calvin Candie'), (2, 5, 'Django'), (2, 6, 'Dr. King Schultz'),
+  (3, 2, 'Frank Abagnale Jr.'), (3, 1, 'Carl Hanratty'),
+  (4, 7, 'Vincent Vega'), (4, 8, 'Mia Wallace'), (4, 9, 'Jules Winnfield'),
+  (5, 10, 'Andy Dufresne'), (5, 11, 'Ellis Boyd Redding'), (5, 12, 'Warden Norton'),
+  (6, 13, 'Tyler Durden'), (6, 14, 'The Narrator'),
+  (7, 15, 'Cooper'), (7, 16, 'Brand'),
+  (8, 17, 'Rose DeWitt Bukater'), (8, 2, 'Jack Dawson'),
+  (9, 13, 'J. Robert Oppenheimer'), (9, 14, 'Kitty Oppenheimer'), (9, 15, 'Leslie Groves'),
+  (10, 1, 'Bruce Wayne'), (10, 18, 'Bane'), (10, 16, 'Selina');

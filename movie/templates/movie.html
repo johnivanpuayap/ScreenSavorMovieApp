@@ -1,20 +1,51 @@
 {% extends 'main.html' %}
 
 {% block content %}
+<div class="flex justify-center min-h-screen">
+    <div class="bg-blue-50 p-20 rounded-lg shadow-lg">
+        <h1 class="text-4xl text-blue-900 mb-5">{{ movie.title }}</h1>
 
-    <h1>Movie</h1>
+        <p class="text-blue-700 mb-2">Year Released: {{ movie.year_released }}</p>
+        <p class="text-blue-700 mb-2">Duration: {{ movie.duration }} minutes</p>
+        <p class="text-blue-700 mb-2">Description: {{ movie.description }}</p>
+        <p class="text-blue-700 mb-4">Director: {{ movie.director }}</p>
+        <p class="text-blue-700 mb-4">Rating: {{ average_rating }} stars</p>
 
-    <h1>Title: {{movie.title }}</h1>
-    <p>Description: {{ movie.description }}</p>
-    <p>Year Released: {{ movie.year_released }}</p>
-    <p>Director: {{ movie.director }}</p>
+        <h2 class="text-xl text-blue-800 mb-2">Genres:</h2>
+        <div class="flex flex-wrap gap-2 mb-4">
+            {% for genre in genres %}
+                <a class="genre-button inline-block px-2 py-1 text-white bg-blue-500 rounded hover:bg-blue-700">{{ genre }}</a>
+            {% endfor %}
+        </div>
+        <br>
 
-    <h2>Genre:</h2>
-    <p>
-        {% for genre in movie.genre.all %}
-            {{ genre.name }}
+        <h2 class="text-xl text-blue-800 mb-2">Cast:</h2>
+        {% for cast in cast_details %}
+            <p class="text-blue-600">{{ cast.name }} as {{ cast.role }}</p>
         {% endfor %}
-    </p>
+        <br>
 
+        <h2 class="text-xl text-blue-800 mb-2">Reviews:</h2>
+        {% if reviews %}
+            {% for review in reviews %}
+                <p class="text-blue-600">rated {{ review.rating }} stars by {{ review.username }}</p>
+                <p class="text-blue-600">"{{ review.description }}"</p>
+                <br>
+            {% endfor %}
+        {% else %}
+            <p class="text-blue-600">No reviews found.</p>
+        {% endif %}
+        <br>
 
+        <h2 class="text-xl text-blue-800 mb-2">Collections:</h2>
+        {% if collections %}
+            {% for collection in collections %}
+                <p class="text-blue-600">{{ collection.name }}</p>
+                <p>{{ collection.user }}</p>
+            {% endfor %}
+        {% else %}
+            <p class="text-blue-600">No collections found.</p>
+        {% endif %}
+    </div>
+</div>
 {% endblock content %}
