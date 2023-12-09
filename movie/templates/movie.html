@@ -6,11 +6,11 @@
         <h1 class="text-4xl text-blue-900 mb-5">{{ movie.title }}</h1>
 
         {% if user.is_authenticated %}
-            <form method="post" action="{% url 'like_movie' movie_id=movie.id %}">
+            <form method="post" action="{% url 'toggle_like_movie' movie_id=movie.id %}">
                 {% csrf_token %}
                 <button type="submit" class="{% if user_likes_movie %}bg-blue-500 hover:bg-red-700{% else %}bg-blue-500 hover:bg-blue-700{% endif %} text-white py-2 px-4 rounded">
                     {% if user_likes_movie %}
-                        Liked
+                        Unlike
                     {% else %}
                         Like
                     {% endif %}

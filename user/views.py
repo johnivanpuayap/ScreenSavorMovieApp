@@ -65,10 +65,10 @@ class AdminRegistrationView(View):
     
 
 @login_required(login_url='/login/')
-def like_movie(request, movie_id):
+def toggle_like_movie(request, movie_id):
     if request.user.is_authenticated:
         with connection.cursor() as cursor:
-            cursor.execute("CALL LikeMovie(%s, %s)", [request.user.username, movie_id])
+            cursor.execute("CALL ToggleLikeMovie(%s, %s)", [request.user.username, movie_id])
         return redirect('movie', movie_id=movie_id)
     else:
-        return render(request, "error.html", {"error_message": "You must be logged in to like a movie."})
+        return render(request, "error.html", {"error_message": "You must be logged in to like or unlike a movie."})
