@@ -46,19 +46,68 @@ BEGIN
         CALL AddMovieGenre(p_genre, movie_id);
 
         -- Insert cast data
-        CALL AddCast(p_cast_data, movie_id);
+        CALL AddMovieCast(p_cast_data, movie_id);
         
         SELECT "Created New Movie" AS outputmessage;
     ELSE
         SELECT "Movie Already Exists" AS outputmessage;
     END IF;
-END$$
-DELIMITER ;
+END
 
+
+# AddMovieCast
+IN `p_cast_data` JSON
+IN `p_movie_id` INT
+BEGIN
+    DECLARE i INT DEFAULT 0;
+    DECLARE cast_count INT DEFAULT JSON_LENGTH(p_cast_data, '$.cast_data');
+    DECLARE cast_id INT DEFAULT 0;
+    DECLARE first_name VARCHAR(100);
+    DECLARE last_name VARCHAR(100);
+    DECLARE role VARCHAR(100);
+    DECLARE added BIT DEFAULT 0;
+    DECLARE movie_exists BIT DEFAULT 0;
+
+    -- Check if the movie exists
+    SELECT 1 INTO movie_exists FROM movie_movie WHERE id = p_movie_id LIMIT 1;
+
+    IF movie_exists = 0 THEN
+        SELECT "Movie does not exist" AS outputmessage;
+    ELSE
+        WHILE i < cast_count DO
+            SET first_name = JSON_UNQUOTE(JSON_EXTRACT(p_cast_data, CONCAT('$.cast_data[', i, '].first_name')));
+            SET last_name = JSON_UNQUOTE(JSON_EXTRACT(p_cast_data, CONCAT('$.cast_data[', i, '].last_name')));
+            SET role = JSON_UNQUOTE(JSON_EXTRACT(p_cast_data, CONCAT('$.cast_data[', i, '].role')));
+
+            SELECT id INTO cast_id FROM movie_cast as mc WHERE mc.first_name = first_name AND mc.last_name = last_name;
+
+            -- Check if the combination doesn't already exist
+            IF cast_id = 0 THEN
+                INSERT INTO movie_cast (first_name, last_name)
+                VALUES (first_name, last_name);
+                SET cast_id = LAST_INSERT_ID();
+                SELECT "Created New Cast Member" AS outputmessage;
+            END IF;
+
+            SELECT 1 INTO added
+            FROM movie_role as mr
+            WHERE mr.movie_id = p_movie_id AND mr.cast_id = cast_id AND mr.role = role;
+
+            IF added = 0 THEN 
+                -- Insert into MovieCast with role
+                INSERT INTO movie_role (movie_id, cast_id, role)
+                VALUES(p_movie_id, cast_id, role);
+                SELECT "Added Cast Member to Movie" AS outputmessage;
+            END IF;
+
+            SET i = i + 1;
+            SET cast_id = 0;
+            SET added = 0;
+        END WHILE;
+    END IF;
+END
 
 # AddMovieGenre
-IN `p_genre` JSON
-IN `p_movie_id` INT
 BEGIN
     DECLARE i INT DEFAULT 0;
     DECLARE genre_count INT;
@@ -104,56 +153,6 @@ BEGIN
             SET added = 0;
         END WHILE;
     END IF;
-END$$
-DELIMITER ;
-
-# AddMovieCast
-IN `p_cast_data` JSON
-IN `p_movie_id` INT
-BEGIN
-    DECLARE i INT DEFAULT 0;
-    DECLARE cast_count INT DEFAULT JSON_LENGTH(p_cast_data, '$.cast_data');
-    DECLARE cast_id INT DEFAULT 0;
-    DECLARE first_name VARCHAR(100);
-    DECLARE last_name VARCHAR(100);
-    DECLARE role VARCHAR(100);
-    DECLARE added BIT DEFAULT 0;
-    DECLARE movie_exists BIT DEFAULT 0;
-
-    -- Check if the movie exists
-    SELECT 1 INTO movie_exists FROM movie_movie WHERE id = p_movie_id LIMIT 1;
-
-    IF movie_exists = 0 THEN
-        SELECT "Movie does not exist" AS outputmessage;
-    ELSE
-        WHILE i < cast_count DO
-            SET first_name = JSON_UNQUOTE(JSON_EXTRACT(p_cast_data, CONCAT('$.cast_data[', i, '].first_name')));
-            SET last_name = JSON_UNQUOTE(JSON_EXTRACT(p_cast_data, CONCAT('$.cast_data[', i, '].last_name')));
-            SET role = JSON_UNQUOTE(JSON_EXTRACT(p_cast_data, CONCAT('$.cast_data[', i, '].role')));
-
-            SELECT id INTO cast_id FROM movie_cast as mc WHERE mc.first_name = first_name AND mc.last_name = last_name;
-
-            -- Check if the combination doesn't already exist
-            IF cast_id = 0 THEN
-                INSERT INTO movie_cast (first_name, last_name)
-                VALUES (first_name, last_name);
-                SET cast_id = LAST_INSERT_ID();
-                SELECT "Created New Cast Member" AS outputmessage;
-            END IF;
-
-            SELECT 1 INTO added
-            FROM movie_moviecast as mmc
-            WHERE mmc.movie_id = p_movie_id AND mmc.cast_id = cast_id AND mmc.role = role;
-
-            IF added = 0 THEN 
-                -- Insert into MovieCast with role
-                INSERT INTO movie_moviecast (movie_id, cast_id, role)
-                VALUES(p_movie_id, cast_id, role);
-                SELECT "Added Cast Member to Movie" AS outputmessage;
-            END IF;
-
-        SET i = i + 1;
-    END WHILE;
 END
 
 # DeleteMovie
@@ -169,7 +168,7 @@ BEGIN
         DELETE FROM user_watchlist WHERE movie_id = p_movie_id;
 
         -- Delete from user_user_liked_movies
-        DELETE FROM user_user_liked_movies WHERE movie_id = p_movie_id;
+        DELETE FROM user_like WHERE movie_id = p_movie_id;
 		
         -- Delete from user_watchhistory
         DELETE FROM user_watchhistory WHERE movie_id = p_movie_id;
@@ -178,7 +177,7 @@ BEGIN
         DELETE FROM movie_movie_genre WHERE movie_id = p_movie_id;
 
         -- Delete from movie_moviecast
-        DELETE FROM movie_moviecast WHERE movie_id = p_movie_id;
+        DELETE FROM movie_role WHERE movie_id = p_movie_id;
 
         -- Delete the movie
         DELETE FROM movie_movie WHERE id = p_movie_id;
@@ -196,16 +195,16 @@ BEGIN
     SELECT * FROM movie_cast
     WHERE NOT EXISTS (
         SELECT 1
-        FROM movie_moviecast
-        WHERE movie_cast.id = movie_moviecast.cast_id
+        FROM movie_role
+        WHERE movie_cast.id = movie_role.cast_id
     );
 
     -- Delete orphaned cast members
     DELETE FROM movie_cast
     WHERE NOT EXISTS (
         SELECT 1
-        FROM movie_moviecast
-        WHERE movie_cast.id = movie_moviecast.cast_id
+        FROM movie_role
+        WHERE movie_cast.id = movie_role.cast_id
     );
 
     -- Select the deleted cast members from the temporary table
@@ -251,13 +250,13 @@ BEGIN
     -- Third result set: Cast details
     SELECT
         CONCAT(c.first_name, ' ', c.last_name) AS Cast,
-        mc.role AS Role
+        mr.role AS Role
     FROM
-        movie_moviecast AS mc
+        movie_role AS mr
     INNER JOIN
-        movie_cast AS c ON mc.cast_id = c.id
+        movie_cast AS c ON mr.cast_id = c.id
     WHERE
-        mc.movie_id = p_movie_id;
+        mr.movie_id = p_movie_id;
 
     -- Fourth result set: Movie Reviews and Average Rating if there are reviews
     IF review_count > 0 THEN
@@ -305,8 +304,8 @@ BEGIN
 
     -- Check if the user likes the movie
     SELECT COUNT(*) INTO user_like_count
-    FROM user_user_liked_movies as liked
-    WHERE liked.user_id = username AND liked.movie_id = p_movie_id;
+    FROM user_like as ul
+    WHERE ul.user_id = p_username AND ul.movie_id = p_movie_id;
     
      -- Seventh result set: Whether the user likes the movie
     SELECT CAST(user_like_count > 0 AS SIGNED) AS Liked;
@@ -347,16 +346,16 @@ BEGIN
 
     -- Check if the movie exists
     SELECT COUNT(*) INTO liked
-    FROM user_user_liked_movies as ulm
+    FROM user_like as ulm
     WHERE ulm.user_id = p_username AND ulm.movie_id = p_movie_id;
 
     IF liked = 0 THEN
         -- Add the movie to the liked movies
-        INSERT INTO user_user_liked_movies(user_id, movie_id) VALUES (p_username, p_movie_id);
+        INSERT INTO user_like(user_id, movie_id, date_liked) VALUES (p_username, p_movie_id, CURRENT_DATE());
         SELECT "Movie Liked Successfully" AS outputmessage;
     ELSE
         -- Remove the movie from the liked movies
-        DELETE FROM user_user_liked_movies WHERE user_id = p_username AND movie_id = p_movie_id;
+        DELETE FROM user_like WHERE user_id = p_username AND movie_id = p_movie_id;
         SELECT "Movie Unliked Successfully" AS outputmessage;
     END IF;
 END
@@ -384,9 +383,9 @@ BEGIN
     LEFT JOIN
         movie_genre AS g ON mg.genre_id = g.id
     LEFT JOIN 
-        movie_moviecast AS mc ON m.id = mc.movie_id
+        movie_role AS mr ON m.id = mr.movie_id
     LEFT JOIN 
-        movie_cast AS c ON mc.cast_id = c.id
+        movie_cast AS c ON mr.cast_id = c.id
     WHERE
         CONCAT(c.first_name, ' ', c.last_name) LIKE CONCAT('%', search_actor, '%')
     GROUP BY 

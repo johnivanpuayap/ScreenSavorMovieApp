@@ -39,7 +39,7 @@ class RegistrationView(View):
             user.set_password(form.cleaned_data['password'])
             user.save()
             login(request, user)
-            return redirect('login')
+            return redirect('home')
         else:
             print(form.errors)
         return render(request, 'user/register.html', {'form': form})

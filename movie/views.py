@@ -25,14 +25,28 @@ class HomeView(View):
             }
             movies_list.append(movie_dict)
 
-        
+
+        with connection.cursor() as cursor:
+            cursor.callproc("Top10LikedMoviesToday")
+            result = cursor.fetchall()
+
+        most_liked_movies = [
+            {
+                'id': row[0],
+                'title': row[1],
+                'like_count': row[2],
+                'average_rating': float(row[3]),
+                'genres': row[4].split(',') if row[4] else [],
+            }
+            for row in result
+        ]
 
         context = {
+            'most_liked_movies': most_liked_movies,
             'movies': movies_list,
         }
 
         return render(request, "home.html", context)
-
 class AddMovieView(View):
 
     def get(self, request):
@@ -45,13 +59,12 @@ class AddMovieView(View):
             entry.save()
             return redirect('home')
 
-
 class GetMovieView(View):
 
-    def get(request, movie_id):
+    def get(self, request, movie_id):
         try:
             with connection.cursor() as cursor:
-                cursor.execute("CALL GetMovieDetails(%s, %s)", [movie_id, request.user.username if request.user.is_authenticated else None])
+                cursor.execute("CALL GetAMovie(%s, %s)", [movie_id, request.user.username if request.user.is_authenticated else None])
                 movie_details = cursor.fetchall()
 
                 cursor.nextset()
@@ -97,14 +110,13 @@ class GetMovieView(View):
         except Movie.DoesNotExist:
             return render(request, "error.html", {"error_message": "Movie not found"})
     
-
 class SearchMovieView(View):
 
-    def get(request):
+    def get(self, request):
         query = request.GET.get('q')
         if query:
             with connection.cursor() as cursor:
-                cursor.execute("CALL SearchMovies(%s)", [query])
+                cursor.execute("CALL SearchMoviesByTitle(%s)", [query])
                 movies = cursor.fetchall()
 
             # Convert tuples to dictionaries
@@ -127,4 +139,28 @@ class SearchMovieView(View):
             return render(request, "search.html", context)
         else:
             return redirect('home')
+        
+
+def getTopLiked(request):
+    with connection.cursor() as cursor:
+            cursor.callproc("Top10LikedMoviesAllTime")
+            result = cursor.fetchall()
+
+    top_liked_movies = [
+        {
+            'id': row[0],
+            'title': row[1],
+            'like_count': row[2],
+            'average_rating': float(row[3]),
+            'genres': row[4].split(',') if row[4] else [],
+        }
+        for row in result
+    ]
+
+    context = {
+        'top_liked_movies': top_liked_movies,
+    }
+
+    return render(request, "top_liked_alltime.html", context)
+
         

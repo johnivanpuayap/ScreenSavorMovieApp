@@ -1,0 +1,18 @@
+<div class="mx-auto text-center">
+    <ul class="flex overflow-x-auto space-x-4">
+        {% for movie in most_liked_movies %}
+            <li class="mb-2 w-64">
+                <div class="border border-gray-400 rounded p-4 h-64 overflow-auto">
+                    <a href="{% url 'movie' movie.id %}" class="text-gray-800 hover:bg-gray-200 block">{{ movie.title }}</a>
+                    <div class="font-bold">Rating:</div> {{ movie.average_rating }}
+                    <div class="font-bold">Likes:</div> {{ movie.like_count }}
+                    <div class="font-bold">Genres:</div>
+                    {% for genre in movie.genres %}
+                        <a class="genre-button text-white bg-blue-500 rounded hover:bg-blue-700 px-2 py-1">{{ genre }}</a>
+                    {% endfor %}
+                </div>
+                <hr class="my-4">
+            </li>
+        {% endfor %}
+    </ul>
+</div>

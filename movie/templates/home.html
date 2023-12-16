@@ -1,9 +1,8 @@
 {% extends 'main.html' %}
 
 {% block content %}
-
-    {% include 'movies_component.html' %}
-    <hr>
-
-    <a href="{% url 'add_movie' %}">Add Movie</a>
+    <h1>Most Liked Movies Today</h1>    
+    {% include 'top_liked_today.html' %}
+    <a href="{% url 'alltime' %}" >See Most Liked of All Time</a>
+    {% include 'movies.html' %}
 {% endblock content %}

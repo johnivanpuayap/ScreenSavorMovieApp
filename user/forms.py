@@ -25,7 +25,7 @@ class LoginForm(AuthenticationForm):
 class RegisterForm(ModelForm):
     class Meta:
         model = User
-        fields = ['username', 'password', 'first_name', 'last_name']
+        fields = ['first_name', 'last_name', 'username', 'password']
         widgets = {
             'username': forms.TextInput(attrs={'class': 'bg-gray-50 border border-gray-300 text-gray-900 text-sm '
                                                         'rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full '
