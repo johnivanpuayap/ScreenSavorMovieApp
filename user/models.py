@@ -8,8 +8,10 @@ class User(AbstractUser):
     first_name = models.CharField(max_length=128, null=False)
     last_name = models.CharField(max_length=128, null=False)
 
-
-    liked_movies = models.ManyToManyField(Movie, related_name='liked_by', blank=True)
+class Like(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    movie = models.ForeignKey(Movie, on_delete=models.CASCADE)
+    date_liked = models.DateField(auto_now_add=True)
 
 class Follow(models.Model):
     follower = models.ForeignKey(User, on_delete=models.CASCADE, related_name='following_set')

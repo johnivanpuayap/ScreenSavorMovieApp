@@ -1,7 +1,7 @@
 from django.forms import ModelForm
 from django.forms import ModelForm
 from django import forms
-from .models import Movie, Genre, Director
+from .models import Movie, Genre, Director, Cast
 
 
 class MovieForm(ModelForm):
@@ -15,3 +15,4 @@ class MovieForm(ModelForm):
     description = forms.CharField(label='Enter Description: ')
     director = forms.ModelChoiceField(queryset=Director.objects.all(), label='Choose Director: ')
     genre = forms.ModelMultipleChoiceField(widget=forms.CheckboxSelectMultiple, queryset=Genre.objects.all(), label='Choose Genre/s: ')
+    cast = forms.ModelMultipleChoiceField(widget=forms.CheckboxSelectMultiple, queryset=Cast.objects.all(), label='Choose Cast/s: ')

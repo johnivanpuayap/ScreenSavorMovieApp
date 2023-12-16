@@ -1,12 +1,31 @@
 <body>
     <h1>Search Page</h1>
-
-    <!-- Search form -->
-    <form>
-        <input type="text" name="search" placeholder="Search...">
-        <button type="submit">Search</button>
-    </form>
-
+    <div class="mx-auto text-center">
+        <ul class="movies_list">
+            <li class="mb-2">
+                <a href="{% url 'home' %}" class="active font-bold">All <span class="text-blue-500">{{ movies.count }}</span></a>
+            </li>
+            {% for movie in movies %}
+                <li class="mb-2">
+                    <a href="{% url 'movie' movie.id %}" class="inline-block px-4 py-2 border border-gray-400 text-gray-800 rounded hover:bg-gray-200">{{ movie.title }}</a>
+                </li>
+    
+                <li class="mb-2">
+                    <span class="font-bold">Rating:</span> {{ movie.average_rating }}
+                </li>
+                <li class="mb-2">
+                    {{ movie.description }}
+                </li>
+                <li class="mb-2">
+                    <span class="font-bold">Genres:</span>
+                    {% for genre in movie.genres %}
+                        <a class="genre-button inline-block px-2 py-1 text-white bg-blue-500 rounded hover:bg-blue-700">{{ genre }}</a>
+                    {% endfor %}
+                </li>
+                <hr class="my-4">
+            {% endfor %}
+        </ul>
+    </div>
     
     <div class="filters">
         <h2>Filters</h2>

@@ -20,7 +20,7 @@ class Director(models.Model):
         return self.first_name + " " + self.last_name
 
     class Meta:
-        ordering = ['first_name', 'last_name', ]  # Change the ordering to last name and then first name
+        unique_together = ('first_name', 'last_name')  # Make sure that there are no duplicate directors
 
 
 class Cast(models.Model):
@@ -31,7 +31,7 @@ class Cast(models.Model):
         return self.first_name + " " + self.last_name
 
     class Meta:
-        ordering = ['first_name', 'last_name', ]  # Change the ordering to last name and then first name
+        unique_together = ('first_name', 'last_name')  # Make sure that there are no duplicate actors
 
 
 class Movie(models.Model):
@@ -42,7 +42,7 @@ class Movie(models.Model):
     genre = models.ManyToManyField(Genre)
     # The project assumes that a movie can only have one director
     director = models.ForeignKey(Director, on_delete=models.CASCADE)
-
+    actors = models.ManyToManyField(Cast, through='Role')
     def __str__(self):
         return self.title
 
@@ -50,10 +50,10 @@ class Movie(models.Model):
         ordering = ['title']
 
 
-class MovieCast(models.Model):
+class Role(models.Model):
     movie = models.ForeignKey(Movie, on_delete=models.CASCADE)
     cast = models.ForeignKey(Cast, on_delete=models.CASCADE)
-    role = models.CharField(max_length=100)
+    character = models.CharField(max_length=100)
 
     def __str__(self):
         return self.movie.__str__() + " as " + self.role
