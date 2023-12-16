@@ -9,9 +9,9 @@ class MovieForm(ModelForm):
         model = Movie
         fields = ['title', 'year_released', 'duration', 'description', 'genre', 'director']
 
-    title = forms.CharField(label='Enter Username: ')
-    year_released = forms.IntegerField(label='Enter Year Released: ')
-    duration = forms.IntegerField(label='Enter Duration (in seconds):')
+    title = forms.CharField(label='Enter Movie Title: ')
+    year_released = forms.IntegerField(widget=forms.TextInput, label='Enter Year Released: ')
+    duration = forms.IntegerField(widget=forms.TextInput, label='Enter Duration (in seconds):')
     description = forms.CharField(label='Enter Description: ')
     director = forms.ModelChoiceField(queryset=Director.objects.all(), label='Choose Director: ')
     genre = forms.ModelMultipleChoiceField(widget=forms.CheckboxSelectMultiple, queryset=Genre.objects.all(), label='Choose Genre/s: ')

@@ -11,31 +11,49 @@ BEGIN
     DECLARE movie_id INT;
     DECLARE director_id INT;
     
-    SELECT id INTO director_id FROM movie_director WHERE first_name = p_director_first_name AND last_name = p_director_last_name LIMIT 1;
+    -- Check if the movie already exists based on title, year released, and director
+    SELECT id INTO movie_id
+    FROM movie_movie
+    WHERE title = p_title
+      AND year_released = p_year_released
+      AND director_id = (SELECT id FROM movie_director WHERE first_name = p_director_first_name AND last_name = p_director_last_name LIMIT 1)
+    LIMIT 1;
 
-    -- If the director doesn't exist, insert them
-    IF director_id IS NULL THEN
-        INSERT INTO movie_director (first_name, last_name) VALUES (p_director_first_name, p_director_last_name);
-        SET director_id = LAST_INSERT_ID();
+    -- If the movie doesn't exist, insert it
+    IF movie_id IS NULL THEN
+        -- If the director doesn't exist, insert them
+        SELECT id INTO director_id FROM movie_director WHERE first_name = p_director_first_name AND last_name = p_director_last_name LIMIT 1;
+
+        IF director_id IS NULL THEN
+            INSERT INTO movie_director (first_name, last_name) VALUES (p_director_first_name, p_director_last_name);
+            SET director_id = LAST_INSERT_ID();
+        END IF;
+
+        -- Insert movie
+        INSERT INTO movie_movie (title, year_released, duration, description, director_id)
+        VALUES (
+            p_title,
+            p_year_released,
+            p_duration,
+            p_description,
+            director_id
+        );
+
+        -- Get the movie ID
+        SET movie_id = LAST_INSERT_ID();
+        
+        -- Add genre to the movie
+        CALL AddMovieGenre(p_genre, movie_id);
+
+        -- Insert cast data
+        CALL AddCast(p_cast_data, movie_id);
+        
+        SELECT "Created New Movie" AS outputmessage;
+    ELSE
+        SELECT "Movie Already Exists" AS outputmessage;
     END IF;
-
-    -- Insert movie
-    INSERT INTO movie_movie (title, year_released, duration, description, director_id)
-    VALUES (
-        p_title,
-        p_year_released,
-        p_duration,
-        p_description,
-        director_id
-    );
-
-    -- Get the movie ID
-    SET movie_id = LAST_INSERT_ID();
-	
-    CALL AddMovieGenre(p_genre, movie_id);
-    -- Insert cast data
-    CALL InsertCastMembers(p_cast_data, movie_id);
-END
+END$$
+DELIMITER ;
 
 
 # AddMovieGenre
@@ -43,36 +61,51 @@ IN `p_genre` JSON
 IN `p_movie_id` INT
 BEGIN
     DECLARE i INT DEFAULT 0;
-    DECLARE genre_count INT DEFAULT JSON_LENGTH(@p_genres, '$[*]');
-    DECLARE genre_name VARCHAR(100)
-    DECLARE genre_id DEFAULT 0
-    DECLARE added BIT DEFAULT 0
-
-    WHILE i < genre_count DO
-        SET genre_name = JSON_UNQUOTE(JSON_EXTRACT(@p_genres, CONCAT('$[', i, ']')));
-
-        SELECT id INTO genre_id FROM movie_genre WHERE name = genre_name;
-
-        IF genre_id = 0
-            INSERT INTO movie_genre (name)
-            VALUES (genre_name)
-            SET genre_id 
-        ENDIF
-
+    DECLARE genre_count INT;
+    DECLARE genre_name VARCHAR(100);
+    DECLARE genre_id INT DEFAULT 0;
+    DECLARE added BIT DEFAULT 0;
+    DECLARE movie_exists BIT DEFAULT 0;
+    
+    -- Check if the movie exists
+    SELECT 1 INTO movie_exists FROM movie_movie WHERE id = p_movie_id LIMIT 1;
+    
+    IF movie_exists = 0 THEN
+        SELECT "Movie does not exist" AS outputmessage;
+    ELSE
+        SET genre_count = JSON_LENGTH(p_genre, '$');
         
-        SELECT 1 INTO added
-        FROM movie_movie_genre 
-        WHERE movie_id = movie_id AND genre_id = @genre_id
+        WHILE i < genre_count DO
+            SET genre_name = JSON_UNQUOTE(JSON_EXTRACT(p_genre, CONCAT('$[', i, ']')));
+            
+            -- Check if genre exists
+            SELECT id INTO genre_id FROM movie_genre WHERE name = genre_name LIMIT 1;
 
-        IF added = 0:
-            -- Insert into movie_movie_genre
-            INSERT INTO movie_movie_genre (movie_id, genre_id) VALUES (p_movie_id, genre_id)
+            -- If genre does not exist, insert it
+            IF genre_id = 0 THEN
+                INSERT INTO movie_genre (name) VALUES (genre_name);
+                SET genre_id = LAST_INSERT_ID();
+                SELECT "Created New Genre" AS outputmessageone;
+            END IF;
 
-        SET i = i + 1;
-        SET genre_id = 0
-        SET added = 0 
-    END WHILE;
-END
+            -- Insert into movie_movie_genre if not exists
+            SELECT 1 INTO added
+            FROM movie_movie_genre as m
+            WHERE m.movie_id = p_movie_id AND m.genre_id = genre_id;
+
+            IF added = 0 THEN
+                INSERT INTO movie_movie_genre (movie_id, genre_id)
+                VALUES (p_movie_id, genre_id);
+                SELECT "Added new genre to movie" AS outputmessagetwo;
+            END IF;
+            
+            SET i = i+1;
+            SET genre_id = 0;
+            SET added = 0;
+        END WHILE;
+    END IF;
+END$$
+DELIMITER ;
 
 # AddMovieCast
 IN `p_cast_data` JSON
@@ -80,34 +113,44 @@ IN `p_movie_id` INT
 BEGIN
     DECLARE i INT DEFAULT 0;
     DECLARE cast_count INT DEFAULT JSON_LENGTH(p_cast_data, '$.cast_data');
-    Declare cast_id INT;
+    DECLARE cast_id INT DEFAULT 0;
+    DECLARE first_name VARCHAR(100);
+    DECLARE last_name VARCHAR(100);
+    DECLARE role VARCHAR(100);
+    DECLARE added BIT DEFAULT 0;
+    DECLARE movie_exists BIT DEFAULT 0;
 
-    WHILE i < cast_count DO
-        SET @first_name = JSON_UNQUOTE(JSON_EXTRACT(p_cast_data, CONCAT('$.cast_data[', i, '].first_name')));
-        SET @last_name = JSON_UNQUOTE(JSON_EXTRACT(p_cast_data, CONCAT('$.cast_data[', i, '].last_name')));
-        SET @role = JSON_UNQUOTE(JSON_EXTRACT(p_cast_data, CONCAT('$.cast_data[', i, '].role')));
+    -- Check if the movie exists
+    SELECT 1 INTO movie_exists FROM movie_movie WHERE id = p_movie_id LIMIT 1;
 
-        SELECT id INTO cast_id FROM movie_cast WHERE first_name = @first_name AND last_name = @last_name
-        
-        -- Check if the combination doesn't already exist
-        IF cast_id IS NULL THEN
-            INSERT INTO movie_cast (first_name, last_name)
-            VALUES (@first_name, @last_name);
-            SELECT "Created a New Cast" AS InsertCast
-        END IF;
+    IF movie_exists = 0 THEN
+        SELECT "Movie does not exist" AS outputmessage;
+    ELSE
+        WHILE i < cast_count DO
+            SET first_name = JSON_UNQUOTE(JSON_EXTRACT(p_cast_data, CONCAT('$.cast_data[', i, '].first_name')));
+            SET last_name = JSON_UNQUOTE(JSON_EXTRACT(p_cast_data, CONCAT('$.cast_data[', i, '].last_name')));
+            SET role = JSON_UNQUOTE(JSON_EXTRACT(p_cast_data, CONCAT('$.cast_data[', i, '].role')));
 
-        -- Get the cast_id for the current cast member
-        SET @cast_id = (SELECT id FROM movie_cast WHERE first_name = @first_name AND last_name = @last_name);
+            SELECT id INTO cast_id FROM movie_cast as mc WHERE mc.first_name = first_name AND mc.last_name = last_name;
 
-        -- Insert into MovieCast with role
-        INSERT INTO movie_moviecast (movie_id, cast_id, role)
-        SELECT movie_id, @cast_id, @role
-        FROM dual
-        WHERE NOT EXISTS (
-            SELECT 1 
-            FROM movie_moviecast 
-            WHERE movie_id = movie_id AND cast_id = @cast_id AND role = @role
-        );
+            -- Check if the combination doesn't already exist
+            IF cast_id = 0 THEN
+                INSERT INTO movie_cast (first_name, last_name)
+                VALUES (first_name, last_name);
+                SET cast_id = LAST_INSERT_ID();
+                SELECT "Created New Cast Member" AS outputmessage;
+            END IF;
+
+            SELECT 1 INTO added
+            FROM movie_moviecast as mmc
+            WHERE mmc.movie_id = p_movie_id AND mmc.cast_id = cast_id AND mmc.role = role;
+
+            IF added = 0 THEN 
+                -- Insert into MovieCast with role
+                INSERT INTO movie_moviecast (movie_id, cast_id, role)
+                VALUES(p_movie_id, cast_id, role);
+                SELECT "Added Cast Member to Movie" AS outputmessage;
+            END IF;
 
         SET i = i + 1;
     END WHILE;

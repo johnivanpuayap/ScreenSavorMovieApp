@@ -40,9 +40,9 @@ class AddMovieView(View):
         return render(request, 'add_movie.html', {'form': form})
 
     def post(self, request):
-        form = MovieForm(request.POST)
-        if form.is_valid():
-            form.save()
+        entry = MovieForm(request.POST)
+        if entry.is_valid():
+            entry.save()
             return redirect('home')
 
 
