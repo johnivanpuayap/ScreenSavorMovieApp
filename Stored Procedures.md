@@ -1,34 +1,3 @@
-# Get Movie Rating
-
-IN movie_id
-DECLARE review_count INT;
-
--- Check if there are reviews
-SELECT COUNT(*) INTO review_count
-FROM review_review AS r
-WHERE r.movie_id = movie_id;
-
-IF review_count > 0 THEN
-    SELECT
-        r.user_id as Username,
-        r.rating as Rating,
-        r.description as Description
-    FROM review_review AS r
-    INNER JOIN user_user AS u ON r.user_id = u.username
-    WHERE r.movie_id = movie_id;
-
-    -- Fifth result set: Average Rating
-    SELECT CAST(AVG(r.rating) AS INT) AS average_rating
-    FROM review_review AS r
-    WHERE r.movie_id = movie_id;
-ELSE
-    -- If no reviews, return a message
-    SELECT 'No reviews found.' AS Review;
-    
-    SELECT 0 AS Rating;
-END IF;
-
-
 # Like/Dislike A Movie
 IN username
 IN movie_id
