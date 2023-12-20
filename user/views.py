@@ -4,6 +4,7 @@ from .forms import *
 from django.views.generic.base import View
 from django.db import connection
 from django.contrib.auth.decorators import login_required
+from django.contrib import messages
 
 class LoginView(View):
     def get(self, request):
@@ -17,9 +18,8 @@ class LoginView(View):
             login(request, user)
             return redirect('home')
         else:
-            error_message = form.errors.as_text()
-        return render(request, 'user/login.html', {'form': form, 'messages': error_message})
-
+            messages.error(request, 'Invalid username or password.')
+        return render(request, 'user/login.html', {'form': form})
 
 def logout_user(request):
     logout(request)
@@ -42,7 +42,8 @@ class RegistrationView(View):
             return redirect('home')
         else:
             error_message = form.errors.as_text()
-        return render(request, 'user/register.html', {'form': form, 'messages': error_message})
+            messages.error(request, error_message)
+        return render(request, 'user/register.html', {'form': form})
 
 class AdminRegistrationView(View):
     def get(self, request):
