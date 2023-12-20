@@ -1,0 +1,16 @@
+{% extends 'main.html' %}
+
+{% block content %}
+    <div class="profile">
+        <h2>{{ user.username }}</h2>
+        <p>Email: {{ user.email }}</p>
+        <p>Joined date: {{ user.date_joined }}</p>
+    </div>
+    <div>
+        Top Genres:
+        <ul>
+            {% for genre in top_genres %}
+                <li>{{ genre }}</li>
+            {% endfor %}
+    </div>
+{% endblock content %}

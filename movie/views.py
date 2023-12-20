@@ -8,23 +8,6 @@ from django.db import connection
 class HomeView(View):
 
     def get(self, request):
-        with connection.cursor() as cursor:
-            cursor.callproc("GetAllMovies")
-            movies = cursor.fetchall()
-
-        # Convert tuples to dictionaries
-        movies_list = []
-        for movie_tuple in movies:
-            movie_dict = {
-                'id': movie_tuple[0],
-                'title': movie_tuple[1],  # Change this to 'title'
-                'year_released': movie_tuple[2],  # Optionally, change this to 'year_released'
-                'description': movie_tuple[4],  # Change this to 'description'
-                'average_rating': float(movie_tuple[6]),  # Change this to 'average_rating'
-                'genres': movie_tuple[7].split(',') if movie_tuple[7] else [],  # Change this to 'genres'
-            }
-            movies_list.append(movie_dict)
-
 
         with connection.cursor() as cursor:
             cursor.callproc("Top10LikedMoviesToday")
@@ -43,10 +26,36 @@ class HomeView(View):
 
         context = {
             'most_liked_movies': most_liked_movies,
-            'movies': movies_list,
         }
 
         return render(request, "home.html", context)
+    
+class MovieListView(View):
+    def get(self, request):
+        with connection.cursor() as cursor:
+                cursor.callproc("GetAllMovies")
+                movies = cursor.fetchall()
+
+        # Convert tuples to dictionaries
+        movies_list = []
+        for movie_tuple in movies:
+            movie_dict = {
+                'id': movie_tuple[0],
+                'title': movie_tuple[1],  # Change this to 'title'
+                'year_released': movie_tuple[2],  # Optionally, change this to 'year_released'
+                'description': movie_tuple[4],  # Change this to 'description'
+                'average_rating': float(movie_tuple[6]),  # Change this to 'average_rating'
+                'genres': movie_tuple[7].split(',') if movie_tuple[7] else [],  # Change this to 'genres'
+            }
+            movies_list.append(movie_dict)
+
+        context = {
+            'movies': movies_list,
+        }
+
+        return render(request, "movies.html", context)
+
+        
 class AddMovieView(View):
 
     def get(self, request):
@@ -134,6 +143,7 @@ class SearchMovieView(View):
 
             context = {
                 'movies': movies_list,
+                'search_query': query if query else '',
             }
 
             return render(request, "search.html", context)
@@ -163,4 +173,13 @@ def getTopLiked(request):
 
     return render(request, "top_liked_alltime.html", context)
 
-        
+def getMoviesByGenre(request, genre_name):
+    genre = get_object_or_404(Genre, name=genre_name)
+    movies = Movie.objects.filter(genre__name__contains=genre_name)
+
+    context = {
+        'movies': movies,
+        'genre': genre.name,
+    }
+
+    return render(request, "genre.html", context)

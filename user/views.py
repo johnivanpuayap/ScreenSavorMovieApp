@@ -17,8 +17,8 @@ class LoginView(View):
             login(request, user)
             return redirect('home')
         else:
-            print(form.errors)
-        return render(request, 'user/login.html', {'form': form})
+            error_message = form.errors.as_text()
+        return render(request, 'user/login.html', {'form': form, 'messages': error_message})
 
 
 def logout_user(request):
@@ -41,8 +41,8 @@ class RegistrationView(View):
             login(request, user)
             return redirect('home')
         else:
-            print(form.errors)
-        return render(request, 'user/register.html', {'form': form})
+            error_message = form.errors.as_text()
+        return render(request, 'user/register.html', {'form': form, 'messages': error_message})
 
 class AdminRegistrationView(View):
     def get(self, request):
@@ -68,7 +68,12 @@ class AdminRegistrationView(View):
 def toggle_like_movie(request, movie_id):
     if request.user.is_authenticated:
         with connection.cursor() as cursor:
-            cursor.execute("CALL ToggleLikeMovie(%s, %s)", [request.user.username, movie_id])
+            cursor.execute("CALL LikeUnlikeMovie(%s, %s)", [request.user.username, movie_id])
         return redirect('movie', movie_id=movie_id)
     else:
         return render(request, "error.html", {"error_message": "You must be logged in to like or unlike a movie."})
+    
+def get_user_profile(request, username):
+    user = User.objects.get(username=username)
+
+    return render(request, 'user/user.html', {'user': user})

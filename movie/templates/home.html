@@ -1,8 +1,23 @@
 {% extends 'main.html' %}
 
 {% block content %}
-    <h1>Most Liked Movies Today</h1>    
-    {% include 'top_liked_today.html' %}
-    <a href="{% url 'alltime' %}" >See Most Liked of All Time</a>
-    {% include 'movies.html' %}
+    <br>
+    <br>
+    <br>
+    <div class="text-center">
+        <h1 class="text-3xl font-bold mb-4">Most Liked Movies Today</h1>
+        {% include 'top_liked_today.html' %}
+        <a href="{% url 'alltime' %}" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
+            See Most Liked of All Time
+        </a>
+    </div>
+    
+    <br>
+    <br>
+    <br>
+    <div class="flex justify-center">
+        <a href="{% url 'movies' %}" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
+            See All Movies
+        </a>
+    </div>
 {% endblock content %}

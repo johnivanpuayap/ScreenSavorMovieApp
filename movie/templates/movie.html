@@ -26,8 +26,8 @@
 
         <h2 class="text-xl text-blue-800 mb-2">Genres:</h2>
         <div class="flex flex-wrap gap-2 mb-4">
-            {% for genre in genres %}
-                <a class="genre-button inline-block px-2 py-1 text-white bg-blue-500 rounded hover:bg-blue-700">{{ genre }}</a>
+            {% for genre_name in genres %}
+                <a class="genre-button inline-block px-2 py-1 text-white bg-blue-500 rounded hover:bg-blue-700" href="{% url 'genre' genre_name %}">{{ genre_name }}</a>
             {% endfor %}
         </div>
         <br>

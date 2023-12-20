@@ -9,7 +9,7 @@ class Genre(models.Model):
         return self.name
 
     class Meta:
-        ordering = ['name']  # Change the ordering to last name and then first name
+        ordering = ['name']
 
 
 class Director(models.Model):
