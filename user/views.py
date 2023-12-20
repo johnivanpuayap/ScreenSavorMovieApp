@@ -8,11 +8,11 @@ from django.contrib import messages
 
 class LoginView(View):
     def get(self, request):
-        form = AuthenticationForm()
+        form = LoginForm()
         return render(request, 'user/login.html', {'form': form})
 
     def post(self, request):
-        form = AuthenticationForm(data=request.POST)
+        form = LoginForm(data=request.POST)
         if form.is_valid():
             user = form.get_user()
             login(request, user)
@@ -77,4 +77,12 @@ def toggle_like_movie(request, movie_id):
 def get_user_profile(request, username):
     user = User.objects.get(username=username)
 
-    return render(request, 'user/user.html', {'user': user})
+    # Execute the stored procedure
+    with connection.cursor() as cursor:
+        cursor.callproc('TopGenresForUser', [username])
+        top_genres = [
+            {'name': row[0]}
+            for row in cursor.fetchall()
+        ]
+
+    return render(request, 'user/user.html', {'user': user, 'top_genres': top_genres})

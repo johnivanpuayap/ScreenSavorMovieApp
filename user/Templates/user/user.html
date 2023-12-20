@@ -1,16 +1,19 @@
 {% extends 'main.html' %}
 
 {% block content %}
-    <div class="profile">
-        <h2>{{ user.username }}</h2>
-        <p>Email: {{ user.email }}</p>
-        <p>Joined date: {{ user.date_joined }}</p>
+    <br>
+    <br>
+    <div class="profile bg-white shadow rounded-lg p-6 mx-auto text-center w-1/2">
+        <h2 class="text-2xl font-bold mb-2">{{ user.username }}</h2>
+        <p class="text-gray-700 mb-1"><span class="font-bold">Name:</span> {{ user.first_name }} {{ user.last_name }}</p>
+        <p class="text-gray-700"><span class="font-bold">Joined date:</span> {{ user.date_joined }}</p>
     </div>
-    <div>
-        Top Genres:
-        <ul>
+    <div class="mt-6 bg-white shadow-lg rounded-lg p-6 mx-auto text-center w-1/2">
+        <h3 class="text-2xl font-bold mb-4 text-blue-600">Top Genres</h3>
+        <div class="flex flex-wrap justify-center gap-2">
             {% for genre in top_genres %}
-                <li>{{ genre }}</li>
+                <span class="inline-block bg-blue-500 text-white py-1 px-3 rounded-full">{{ genre.name }}</span>
             {% endfor %}
+        </div>
     </div>
 {% endblock content %}

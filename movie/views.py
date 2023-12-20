@@ -110,7 +110,7 @@ class GetMovieView(View):
                 "genres": [genre[0] for genre in genres],
                 "cast_details": [{"name": cast[0], "role": cast[1]} for cast in cast_details],
                 "reviews": [{"username": review[0], "rating": review[1], "description": review[2]} for review in reviews] if reviews and reviews[0][0] != 'No reviews found.' else None,
-                "average_rating": average_rating[0][0] if average_rating else 0,
+                "average_rating": int(average_rating[0][0]) if average_rating else 0,
                 "collections": [{"name": collection[0], "user": collection[1]} for collection in collections] if collections and collections[0][0] != 'No collections found.' else None,
                 "user_likes_movie": user_likes[0][0] if user_likes else False,
             }

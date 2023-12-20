@@ -257,6 +257,10 @@ BEGIN
         movie_cast AS c ON mr.cast_id = c.id
     WHERE
         mr.movie_id = p_movie_id;
+        
+    SELECT Count(*) INTO review_count
+    FROM review_review
+    WHERE review_review.movie_id = p_movie_id;
 
     -- Fourth result set: Movie Reviews and Average Rating if there are reviews
     IF review_count > 0 THEN
