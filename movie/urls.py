@@ -9,5 +9,6 @@ urlpatterns = [
     path('add/', AddMovieView.as_view(), name='add_movie'),
     path('search/', SearchMovieView.as_view(), name='search'),
     path('all/', views.MovieListView.as_view(), name='movies'),
-    path('genre/<str:genre_name>', views.getMoviesByGenre, name='genre')
+    path('genre/<str:genre_name>', views.getMoviesByGenre, name='genre'),
+    path('director/<str:director_name>', views.getMoviesByDirector, name='director')
 ]

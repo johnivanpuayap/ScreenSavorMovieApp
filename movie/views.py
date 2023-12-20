@@ -1,7 +1,7 @@
 from django.shortcuts import render, get_object_or_404, redirect
 from django.views.generic.base import View
 from django.db.models import Q
-from .models import Movie, Genre
+from .models import Movie, Genre, Director
 from .forms import MovieForm
 from django.db import connection
 
@@ -55,18 +55,6 @@ class MovieListView(View):
 
         return render(request, "movies.html", context)
 
-        
-class AddMovieView(View):
-
-    def get(self, request):
-        form = MovieForm()
-        return render(request, 'add_movie.html', {'form': form})
-
-    def post(self, request):
-        entry = MovieForm(request.POST)
-        if entry.is_valid():
-            entry.save()
-            return redirect('home')
 
 class GetMovieView(View):
 
@@ -150,7 +138,6 @@ class SearchMovieView(View):
         else:
             return redirect('home')
         
-
 def getTopLiked(request):
     with connection.cursor() as cursor:
             cursor.callproc("Top10LikedMoviesAllTime")
@@ -183,3 +170,27 @@ def getMoviesByGenre(request, genre_name):
     }
 
     return render(request, "genre.html", context)
+
+def getMoviesByDirector(request, director_name):
+    firstname, lastname = director_name.split(' ', 1)
+    director = Director.objects.filter(first_name=firstname, last_name=lastname)
+
+    movies = Movie.objects.filter(director=director[0])
+    context = {
+        'movies': movies,
+        'director': director_name,
+    }
+
+    return render(request, "director.html", context)
+
+class AddMovieView(View):
+
+    def get(self, request):
+        form = MovieForm()
+        return render(request, 'add_movie.html', {'form': form})
+
+    def post(self, request):
+        entry = MovieForm(request.POST)
+        if entry.is_valid():
+            entry.save()
+            return redirect('home')
