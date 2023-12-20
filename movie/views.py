@@ -1,7 +1,7 @@
 from django.shortcuts import render, get_object_or_404, redirect
 from django.views.generic.base import View
 from django.db.models import Q
-from .models import Movie, Genre, Director
+from .models import Movie, Genre, Director, Cast, Role
 from .forms import MovieForm
 from django.db import connection
 
@@ -49,12 +49,46 @@ class MovieListView(View):
             }
             movies_list.append(movie_dict)
 
+        genres = Genre.objects.all()
+
         context = {
             'movies': movies_list,
+            'genres': genres
         }
 
         return render(request, "movies.html", context)
 
+    def post(self, request):
+        with connection.cursor() as cursor:
+                genre = request.POST.get('genre')
+
+                if(genre == 'All'):
+                    cursor.callproc("GetAllMovies")
+                else:
+                    cursor.callproc("GetAllMoviesGenre", [request.POST.get('genre')])
+                movies = cursor.fetchall()
+
+        # Convert tuples to dictionaries
+        movies_list = []
+        for movie_tuple in movies:
+            movie_dict = {
+                'id': movie_tuple[0],
+                'title': movie_tuple[1],  # Change this to 'title'
+                'year_released': movie_tuple[2],  # Optionally, change this to 'year_released'
+                'description': movie_tuple[4],  # Change this to 'description'
+                'average_rating': float(movie_tuple[6]),  # Change this to 'average_rating'
+                'genres': movie_tuple[7].split(',') if movie_tuple[7] else [],  # Change this to 'genres'
+            }
+            movies_list.append(movie_dict)
+
+        genres = Genre.objects.all()
+
+        context = {
+            'movies': movies_list,
+            'genres': genres
+        }
+
+        return render(request, "movies.html", context)
 
 class GetMovieView(View):
 
@@ -182,6 +216,21 @@ def getMoviesByDirector(request, director_name):
     }
 
     return render(request, "director.html", context)
+
+def getCastByDirector(request, cast_name):
+    firstname, lastname = cast_name.split(' ', 1)
+    cast = Cast.objects.filter(first_name=firstname, last_name=lastname)
+
+    roles = Role.objects.filter(cast=cast[0])
+
+    movies = [role.movie for role in roles]
+
+    context = {
+        'movies': movies,
+        'cast': cast_name,
+    }
+
+    return render(request, "cast.html", context)
 
 class AddMovieView(View):
 

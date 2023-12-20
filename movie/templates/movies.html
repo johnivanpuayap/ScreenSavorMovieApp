@@ -5,6 +5,15 @@
     <br>
     <div class="mx-auto text-center">
         <h2 class="text-3xl font-bold mb-4">Browse All Movies</h2>
+        <form method="post">
+            {% csrf_token %}
+            <select name="genre" onchange="this.form.submit()">
+                <option value="All">All Genres</option>
+                {% for genre in genres %}
+                    <option value="{{ genre.id }}" {% if request.POST.genre == genre.id|stringformat:"s" %}selected{% endif %}>{{ genre.name }}</option>
+                {% endfor %}
+            </select>
+        </form>
     </div>
     {% include 'display_movies.html' %}
 {% endblock content %}

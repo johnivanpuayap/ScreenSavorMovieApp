@@ -85,4 +85,11 @@ def get_user_profile(request, username):
             for row in cursor.fetchall()
         ]
 
-    return render(request, 'user/user.html', {'user': user, 'top_genres': top_genres})
+    with connection.cursor() as cursor:
+        cursor.callproc('GetLikedMovies', [username])
+        liked_movies = [
+            {'id': row[0], 'title': row[1]}
+            for row in cursor.fetchall()
+        ]
+
+    return render(request, 'user/user.html', {'user': user, 'top_genres': top_genres, 'liked_movies': liked_movies})
